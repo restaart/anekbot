@@ -1,4 +1,3 @@
-import asyncio
 import os
 import pickle
 
@@ -7,29 +6,31 @@ import pickle
 
 
 def load_embeddings():
-    EMBEDDINGS_PATH = 'data/embeddings'
+    EMBEDDINGS_PATH = "data/embeddings"
     embedings = []
-    files = sorted(os.listdir(EMBEDDINGS_PATH), key=lambda x:int(x.split('_')[1]))
+    files = sorted(os.listdir(EMBEDDINGS_PATH), key=lambda x: int(x.split("_")[1]))
     for file in files:
         path = EMBEDDINGS_PATH + "/" + file
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             batch = pickle.load(f)
             embedings.extend(batch)
 
     return embedings
 
-def load_data(return_values = True):
-    df = pandas.read_csv('data/baneks.csv')
-    df.date = pandas.to_datetime(df.date, unit='s')
-    df = df.rename(columns={'date':'cdate', 'text':'body'})
+
+def load_data(return_values=True):
+    df = pandas.read_csv("data/baneks.csv")
+    df.date = pandas.to_datetime(df.date, unit="s")
+    df = df.rename(columns={"date": "cdate", "text": "body"})
     df = df[:-1]
-    df['embedding'] = load_embeddings()
+    df["embedding"] = load_embeddings()
     df.embedding = df.embedding.apply(np.array)
-    df = df['cdate likes_count body embedding'.split()]
+    df = df["cdate likes_count body embedding".split()]
 
     if return_values:
         return df.values
     return df
+
 
 # def load_data():
 #     with open('data/init.pkl', 'rb') as f:

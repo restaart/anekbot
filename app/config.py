@@ -1,11 +1,10 @@
 from pathlib import Path
 
-from pydantic import BeforeValidator, PostgresDsn
+from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings
-from typing import Optional, Annotated
-
 
 root_path = Path(__file__).parent.parent
+
 
 class Settings(BaseSettings):
     TG_TOKEN: str
@@ -20,5 +19,6 @@ class Settings(BaseSettings):
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }
+
 
 settings = Settings()
