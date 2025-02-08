@@ -17,20 +17,17 @@ class Joke(Base):
     likes_count: Mapped[int] = mapped_column(Integer, default=0)
     has_my_like: Mapped[bool] = mapped_column(Boolean, default=False)
     date: Mapped[datetime] = mapped_column(DateTime)
-    embedding: Mapped[list[float]] = mapped_column(Vector(1536))
+    embedding: Mapped[list[float]] = mapped_column(Vector(2000))
 
-    # Create IVFFlat index for faster similarity search
     __table_args__ = (
         Index(
             "jokes_embedding_idx",
             "embedding",
             postgresql_using="ivfflat",
-            postgresql_with={
-                "lists": 100
-            },  # Number of lists, adjust based on your data size
+            postgresql_with={"lists": 100},
             postgresql_ops={"embedding": "vector_l2_ops"},
         ),
     )
 
     def __repr__(self) -> str:
-        return f"Post(id={self.id}, external_id={self.external_id})"
+        return f"Joke(id={self.id}, text={self.text[:15]}...)"

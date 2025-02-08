@@ -5,7 +5,7 @@ from datetime import datetime
 from itertools import batched
 from typing import List, Dict
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.ai import get_embedding
@@ -19,16 +19,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 500
-PATH = "../data/baneks.csv"
+PATH = "../.data/baneks.csv"
 
 
 def create_joke(row: Dict, embedding) -> Joke:
-    """Create a joke instance from row data"""
+    """Create a joke instance from row .data"""
     row = map_file_row(row)
-    return Joke(
-        **row,
-        embedding=embedding,
-    )
+    return Joke(**row, embedding=embedding)
 
 
 def map_file_row(row: Dict) -> Dict:
@@ -80,6 +77,10 @@ async def load_jokes_from_csv(filepath: str):
             for batch in batched(csv.DictReader(f), BATCH_SIZE):
                 added = await process_batch(session, batch)
                 logger.info(f"Processed {len(batch)} jokes, added {added} new jokes")
+        logger.info(f"Reindexing...")
+        await session.execute(text('SET maintenance_work_mem = "128MB";'))
+        await session.execute(text("REINDEX INDEX jokes_embedding_idx;"))
+        logger.info(f"Done.")
 
 
 def main():
