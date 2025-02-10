@@ -11,7 +11,7 @@ A Telegram bot, that make jokes, that are related(sometimes) to your messages.
 
 
 ## Installation
-
+Edit `docker-compose-full.yml`, adding your bot token, OpenAI API key, etc and then:
 ```bash
 docker compose -f "docker-compose-full.yml" up --build
 ```
