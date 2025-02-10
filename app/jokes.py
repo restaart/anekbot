@@ -7,7 +7,6 @@ from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai import get_embedding
-from app.database import async_session
 from app.models import Joke
 
 
@@ -59,10 +58,12 @@ class JokeRepository:
 
 
 if __name__ == "__main__":
+    from app.database import get_session
 
     async def main():
         """Example usage of JokeRepository"""
-        async with async_session() as session:
+
+        async with get_session() as session:
             repo = JokeRepository(session)
 
             # Example: find similar jokes to a query
