@@ -25,7 +25,7 @@ def auth_ok(message: Message) -> bool:
     return message.from_user.username in settings.admin_usernames
 
 
-def is_mentioned(message_text:str):
+def is_mentioned(message_text: str):
     return BOT_STATE["me"].username in message_text
 
 
@@ -34,7 +34,7 @@ async def send_welcome(message: Message):
     await message.reply("Привет! Я рассказываю анекдоты к месту и не очень")
 
 
-def get_message_text(message:Message):
+def get_message_text(message: Message):
     match message.content_type:
         case ContentType.TEXT:
             return message.text

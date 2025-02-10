@@ -1,5 +1,4 @@
 from pathlib import Path
-
 from pydantic import PostgresDsn, BaseModel, PositiveInt, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -7,7 +6,9 @@ root_path = Path(__file__).parent.parent
 
 
 class DatabaseSettings(BaseModel):
-    DSN: PostgresDsn
+    DSN: PostgresDsn = Field(
+        description="PostgreSQL connection string"
+    )
     pool_size: PositiveInt = Field(
         default=20,
         description="Number of connections to keep open"
@@ -27,13 +28,28 @@ class DatabaseSettings(BaseModel):
         gt=300
     )
 
+
 class Settings(BaseSettings):
-    tg_token: str
-    admin_usernames: list[str]
-    openai_token: str
-    embedding_model: str = "text-embedding-3-large"
-    embedding_vector_size: int = 2000
-    database: DatabaseSettings
+    tg_token: str = Field(
+        description="Telegram Bot API token"
+    )
+    admin_usernames: list[str] = Field(
+        description="List of Telegram usernames with admin access"
+    )
+    openai_token: str = Field(
+        description="OpenAI API token"
+    )
+    embedding_model: str = Field(
+        default="text-embedding-3-large",
+        description="Name of the OpenAI embedding model to use"
+    )
+    embedding_vector_size: int = Field(
+        default=2000,
+        description="Size of the embedding vectors produced by the model"
+    )
+    database: DatabaseSettings = Field(
+        description="Database connection settings"
+    )
 
     model_config = SettingsConfigDict(
         extra="ignore",

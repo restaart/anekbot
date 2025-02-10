@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    container_name: anekbot
+    environment:
+      TG_TOKEN: "..."
+      ADMIN_USERNAMES: '[]'
+      EMBEDDING_MODEL: "text-embedding-3-large"
+      OPENAI_TOKEN: "sk-..."
+      DATABASE__DSN: "postgresql+asyncpg://postgres:postgres@postgres:5432/vectordb"
+    entrypoint: >
+      sh -c "export PYTHONPATH=. && python -m alembic upgrade head &&
+               python scripts/load_jokes.py data/example_jokes.csv &&
+               python main.py"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  postgres:
+    restart: unless-stopped
+    image: pgvector/pgvector:pg17
+    container_name: pgvector
+    environment:
+      POSTGRES_DB: vectordb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

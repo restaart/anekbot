@@ -1,6 +1,7 @@
 import asyncio
 import csv
 import logging
+import sys
 from datetime import datetime
 from itertools import batched
 from typing import List, Dict
@@ -19,7 +20,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 BATCH_SIZE = 500
-PATH = "../.data/baneks.csv"
 
 
 def create_joke(row: Dict, embedding) -> Joke:
@@ -84,7 +84,11 @@ async def load_jokes_from_csv(filepath: str):
 
 
 def main():
-    asyncio.run(load_jokes_from_csv(PATH))
+    try:
+        path = sys.argv[1]
+    except KeyError as e:
+        raise Exception("File Path arg is missing.") from e
+    asyncio.run(load_jokes_from_csv(path))
 
 
 if __name__ == "__main__":
