@@ -10,7 +10,7 @@ from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.ai import get_embedding
-from app.database import async_session
+from app.database import get_session
 from app.models import Joke
 
 # Configure logging
@@ -72,7 +72,7 @@ async def process_batch(session, batch: List[Dict]) -> int:
 async def load_jokes_from_csv(filepath: str):
     """Load jokes from CSV file into database with batching"""
 
-    async with async_session() as session:
+    async with get_session() as session:
         with open(filepath, "r", encoding="utf-8") as f:
             for batch in batched(csv.DictReader(f), BATCH_SIZE):
                 added = await process_batch(session, batch)

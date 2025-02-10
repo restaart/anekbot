@@ -6,9 +6,8 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from app.config import settings
+from app.config import get_settings
 from app.database import Base
-from app.models import Joke
 
 config = context.config
 
@@ -19,7 +18,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = settings.database.DSN
+    url = get_settings().database.DSN
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -40,7 +39,7 @@ def do_run_migrations(connection: Connection) -> None:
 
 async def run_async_migrations() -> None:
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = str(settings.database.DSN)
+    configuration["sqlalchemy.url"] = str(get_settings().database.DSN)
     connectable = async_engine_from_config(
         configuration,
         prefix="sqlalchemy.",

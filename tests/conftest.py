@@ -1,14 +1,19 @@
 import asyncio
+import os
 import pickle
+from pathlib import Path
 from typing import AsyncGenerator
 from unittest.mock import patch, AsyncMock, Mock
 
 import pytest
+from alembic import command
+from alembic.config import Config
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from testcontainers.postgres import PostgresContainer
 
 from app.config import Settings
-from tests.utils import run_async_migrations, PROJECT_ROOT
+
+PROJECT_ROOT = Path(__file__).parent.parent
 
 
 @pytest.fixture(scope="session")
@@ -41,29 +46,36 @@ def mock_embeddings():
 
 @pytest.fixture(scope="session", autouse=True)
 def test_settings():
-    test_settings = Settings(
-        TG_TOKEN="123",
-        ADMIN_USERNAMES=["user"],
-        OPENAI_TOKEN="123",
-        DATABASE_URL="postgresql+asyncpg://test:test@localhost:5432/test",
-    )
-    with patch("app.config.settings", new=test_settings):
+    os.environ["TG_TOKEN"] = "123"
+    os.environ["ADMIN_USERNAMES"] = '["user"]'
+    os.environ["EMBEDDING_MODEL"] = "text-embedding-3-large"
+    os.environ["OPENAI_TOKEN"] = "sk-asd"
+    os.environ["DATABASE__DSN"] = "postgresql+asyncpg://test:test@localhost:5432/test"
+    test_settings = Settings()
+    get_test_settings = lambda: test_settings
+    with patch("app.config.get_settings", new=get_test_settings):
         yield test_settings
 
 
 @pytest.fixture(scope="session")
 async def postgres_container(test_settings):
     with PostgresContainer("pgvector/pgvector:pg17", driver="asyncpg") as postgres:
-        test_settings.DATABASE_DSN = postgres.get_connection_url().replace(
+        test_settings.database.DSN = postgres.get_connection_url().replace(
             "postgresql://", "postgresql+asyncpg://"
         )
         yield postgres
 
 
 @pytest.fixture(scope="session")
-async def db_engine(postgres_container, test_settings):
-    engine = create_async_engine(str(test_settings.DATABASE_DSN), echo=False)
-    await run_async_migrations()
+async def db_engine(postgres_container, test_settings: Settings):
+    engine = create_async_engine(str(test_settings.database.DSN), echo=False)
+    alembic_cfg = Config(PROJECT_ROOT / "alembic.ini")
+
+    alembic_cfg.set_main_option("sqlalchemy.url", str(test_settings.database.DSN))
+    alembic_cfg.set_main_option("script_location", str(PROJECT_ROOT / "migrations"))
+
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(None, command.upgrade, alembic_cfg, "head")
     try:
         yield engine
     finally:
