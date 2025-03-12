@@ -49,9 +49,9 @@ class JokeRepository:
         return [(joke, float(distance)) for joke, distance in result]
 
     async def get_joke(
-        self, text: str, limit: int = 5, min_likes: int = 0
+        self, text: str, limit: int = 5, min_likes: int = 0, max_length=800
     ) -> Joke | None:
-        jokes = await self.get_top_n_similar_jokes(text, limit, min_likes)
+        jokes = await self.get_top_n_similar_jokes(text, limit, min_likes, max_length)
         if not jokes:
             return None
         return random.choice(jokes)[0]
