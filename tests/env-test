@@ -1,0 +1,6 @@
+TG_TOKEN="123123"
+ADMIN_USERNAMES=["user"]
+EMBEDDING_MODEL="text-embedding-3-large"
+OPENAI_TOKEN="sk-1231"
+DATABASE__DSN="postgresql+asyncpg://test:test@localhost:50432/test"
+PROXY_TOKEN = "123123"

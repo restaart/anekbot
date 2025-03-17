@@ -30,6 +30,6 @@ asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 env = [
-    "ENV_FILE=tests/.env-test",
+    "ENV_FILE=tests/env-test",
 ]
 
