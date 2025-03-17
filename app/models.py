@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import DateTime, Integer, String, Boolean, Index, JSON, select
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -35,6 +35,8 @@ class Joke(Base):
 
 
 class ChatSettings(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     enabled: bool = False
     joke_min_likes: int = 0
     joke_max_length: int = 800
@@ -56,7 +58,7 @@ if __name__ == "__main__":
 
     async def main():
         async with get_session() as session:
-            query = select(ChatSettingsDB).where(ChatSettingsDB.chat_id == '1000')
+            query = select(ChatSettingsDB).where(ChatSettingsDB.chat_id == "1000")
             result = await session.execute(query)
             settings = result.scalar_one_or_none()
             print(settings)

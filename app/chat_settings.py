@@ -5,16 +5,10 @@ from app.database import get_session
 from app.models import ChatSettings, ChatSettingsDB
 
 
-async def get_chat_settings(chat_id: str, session: AsyncSession = None) -> ChatSettings:
-    """
-    Get chat settings by chat_id
+async def get_chat_settings(
+    chat_id: int | str, session: AsyncSession = None
+) -> ChatSettings:
 
-    Args:
-        chat_id: Chat identifier
-
-    Returns:
-        ChatSettings object
-    """
     chat_id = str(chat_id)
     async with session or get_session() as session:
         result = await session.execute(
@@ -27,15 +21,9 @@ async def get_chat_settings(chat_id: str, session: AsyncSession = None) -> ChatS
 
 
 async def set_chat_settings(
-    chat_id: str, settings: ChatSettings, session: AsyncSession = None
+    chat_id: int | str, settings: ChatSettings, session: AsyncSession = None
 ) -> None:
-    """
-    Set chat settings by chat_id
 
-    Args:
-        chat_id: Chat identifier
-        settings: ChatSettings object
-    """
     chat_id = str(chat_id)
     settings_dict = settings.model_dump(exclude_defaults=True)
     async with session or get_session() as session:
@@ -56,7 +44,7 @@ async def set_chat_settings(
 if __name__ == "__main__":
 
     async def main():
-        chat_id = '1213'
+        chat_id = "1213"
         async with get_session() as session:
             settings = await get_chat_settings(chat_id, session)
             print(settings)

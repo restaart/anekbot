@@ -1,4 +1,3 @@
-from functools import cache
 from pathlib import Path
 
 from pydantic import PostgresDsn, BaseModel, PositiveInt, Field
@@ -44,6 +43,8 @@ class Settings(BaseSettings):
     )
 
 
-@cache
-def get_settings() -> Settings:
-    return Settings(_env_file=str(root_path / ".env"))
+import os
+
+os.environ.setdefault("ENV_FILE", str(root_path / ".env"))
+
+settings = Settings(_env_file=os.environ["ENV_FILE"])
