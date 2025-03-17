@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from testcontainers.postgres import PostgresContainer
 
 PROJECT_ROOT = Path(__file__).parent.parent
-os.environ["ENV_FILE"] = str(PROJECT_ROOT / "tests" / ".env-test")
+os.environ["ENV_FILE"] = str(PROJECT_ROOT / "tests" / "env-test")
 
 from app.config import settings
 from app.bot_state import BOT_STATE
